@@ -4,14 +4,27 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using PM.Models;
-
+using DataService.Services;
+using DataService.Interfaces;
 namespace PM.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IAccountService _accountService;
+        /// <summary>
+        /// Hàm khởi tạo
+        /// </summary>
+        /// <param name="accountService"></param>
+        /// <param name="LogLoginService"></param>
+        /// <returns></returns>
+        public HomeController(IAccountService accountService)
+        {
+            this._accountService = accountService;
+        }
+
         public IActionResult Index()
         {
+            var ret = _accountService.Login("test", "test");
             return View();
         }
 
@@ -34,10 +47,10 @@ namespace PM.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        //[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        //public IActionResult Error()
+        //{
+        //    return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        //}
     }
 }

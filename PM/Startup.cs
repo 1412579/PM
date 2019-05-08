@@ -9,7 +9,10 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
+using DataService.Interfaces;
+using DataService.Services;
+using DataModel.Interfaces;
+using DataModel.Repositories;
 namespace PM
 {
     public class Startup
@@ -30,7 +33,8 @@ namespace PM
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
+            services.AddSingleton<IAccountService, AccountService>();
+            services.AddSingleton<IUnitOfWork, UnitOfWork>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
