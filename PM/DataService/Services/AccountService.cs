@@ -36,7 +36,7 @@ namespace DataService.Services
             Users result;
             try
             {
-                result = repository.Get(a => a.UserName == username && a.Password == password);
+                result = repository.Get(a => a.UserName == username && a.Password == PM.lib.CrytoHelper.GetMD5Hash(password));
             }
             catch (Exception ex)
             {

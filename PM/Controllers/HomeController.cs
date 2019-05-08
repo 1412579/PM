@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using DataService.Services;
 using DataService.Interfaces;
+using PM.lib;
+using Microsoft.AspNetCore.Authorization;
 namespace PM.Controllers
 {
     public class HomeController : Controller
@@ -21,10 +23,12 @@ namespace PM.Controllers
         {
             this._accountService = accountService;
         }
-
+        [Authorize]
         public IActionResult Index()
         {
-            var ret = _accountService.Login("test", "test");
+            //var ret = _accountService.Login("test", "test");
+            //var test = CrytoHelper.GetMD5Hash("test");
+            //var temp = CrytoHelper.GetMD5Hash("test");
             return View();
         }
 
