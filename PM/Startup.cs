@@ -38,6 +38,7 @@ namespace PM
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             //dependecy injection
+            services.AddSingleton<ICategoryService, CategoryService>();
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<IUnitOfWork, UnitOfWork>();
 

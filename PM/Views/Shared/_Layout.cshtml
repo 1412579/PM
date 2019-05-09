@@ -58,14 +58,14 @@
                                 <li>
                                     <a><i class="fa fa-desktop"></i> Quản lý ngành hàng<span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        <li><a href="index.html">Thêm ngành hàng mới</a></li>
-                                        <li><a href="index3.html">Danh sách ngành hàng</a></li>
+                                        <li><a asp-controller="Category" asp-action="AddEdit">Thêm ngành hàng mới</a></li>
+                                        <li><a asp-controller="Category" asp-action="Listing">Danh sách ngành hàng</a></li>
                                     </ul>
                                 </li>
                                 <li>
                                     <a><i class="fa fa-table"></i> Quản lý sản phẩm <span class="fa fa-chevron-down"></span></a>
                                     <ul class="nav child_menu">
-                                        <li><a href="@Url.Action("AddEdit","Product")">Thêm sản phẩm</a></li>
+                                        <li><a asp-controller="Product" asp-action="AddEdit">Thêm sản phẩm</a></li>
                                         <li><a href="index2.html">Danh sách sản phẩm</a></li>
                                         <li><a href="index3.html">Dashboard3</a></li>
                                     </ul>
