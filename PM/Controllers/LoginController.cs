@@ -13,11 +13,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 namespace PM.Controllers
 {
+    [AllowAnonymous]
     public class LoginController : Controller
     {
         private readonly IAccountService _accountService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private ISession _session => _httpContextAccessor.HttpContext.Session;
+        //private readonly IHttpContextAccessor _httpContextAccessor;
+        //private ISession _session => _httpContextAccessor.HttpContext.Session;
         /// <summary>
         /// Hàm khởi tạo
         /// </summary>
@@ -28,14 +29,12 @@ namespace PM.Controllers
         {
             this._accountService = accountService;
         }
-        [AllowAnonymous]
         public IActionResult Index(string requestPath)
         {
             ViewBag.RequestPath = requestPath ?? "/";
             return View();
         }
         [HttpPost]
-        [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(LoginViewModel model)
         {
@@ -51,7 +50,7 @@ namespace PM.Controllers
                     }
                     return RedirectToAction("Index", "Home");
                 }
-                ModelState.AddModelError("InvalidCredentials", "Invalid credentials.");
+                ModelState.AddModelError("InvalidAuth", "Tên đăng nhập hoặc mật khẩu không chính xác");
             }
             return View(model);
         }

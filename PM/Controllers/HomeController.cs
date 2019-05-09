@@ -10,6 +10,7 @@ using PM.lib;
 using Microsoft.AspNetCore.Authorization;
 namespace PM.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly IAccountService _accountService;
@@ -23,7 +24,6 @@ namespace PM.Controllers
         {
             this._accountService = accountService;
         }
-        [Authorize]
         public IActionResult Index()
         {
             //var ret = _accountService.Login("test", "test");

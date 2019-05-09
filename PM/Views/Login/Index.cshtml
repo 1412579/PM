@@ -52,6 +52,7 @@
                             <input class="btn btn-default submit" type="submit" value="Đăng nhập">
                             @*<a class="reset_pass" href="#">Lost your password?</a>*@
                         </div>
+                            @Html.ValidationMessage("InvalidAuth", new { @class = "text-danger" })
                         @*<div class="clearfix"></div>
                         <div class="separator">
                             <p class="change_link">
