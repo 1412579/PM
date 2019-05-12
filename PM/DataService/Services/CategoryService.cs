@@ -39,14 +39,14 @@ namespace DataService.Services
 
         public ProductCategory Get(int idp)
         {
-            throw new NotImplementedException();
+            return _productCategoryRepository.Get(x=>x.CategoryId == idp && (x.IsDelete == false || x.IsDelete == null));
         }
 
         public List<ProductCategory> GetAll(int page = -1, int size = 10)
         {
             try
             {
-                var rsl = _productCategoryRepository.GetAll();
+                var rsl = _productCategoryRepository.GetAll(x => x.IsDelete == false || x.IsDelete == null);
                 if(rsl != null && rsl.Any())
                 {
                     if (page == -1)
@@ -67,9 +67,18 @@ namespace DataService.Services
             throw new NotImplementedException();
         }
 
-        public bool Update(ProductCategory product)
+        public bool Update(ProductCategory model)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _productCategoryRepository.Update(model);
+                _unitOfWork.SaveChange();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

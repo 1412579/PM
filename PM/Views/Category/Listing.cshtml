@@ -37,6 +37,7 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Tên ngành hàng</th>
+                                    <th>Thao tác</th>
                                 </tr>
                             </thead>
 
@@ -48,6 +49,7 @@
                                         <tr>
                                             <td>@item.CategoryId</td>
                                             <td>@item.CategoryName</td>
+                                            <td><a asp-controller="Category" asp-action="AddEdit" asp-route-cateId="@item.CategoryId" class="btn btn-primary">Sửa</a> <a asp-controller="Category" asp-action="Delete" asp-route-cateId="@item.CategoryId" class="btn btn-danger">Xoá</a></td>
                                         </tr>
                                     }
                                 }

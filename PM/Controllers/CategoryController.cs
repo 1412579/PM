@@ -29,7 +29,12 @@ namespace PM.Controllers
         }
         public IActionResult AddEdit(int cateId)
         {
-            return View();
+            var model = new ProductCategory();
+            if (cateId > 0)
+            {
+                model = _categoryService.Get(cateId);
+            }
+            return View(model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -37,15 +42,33 @@ namespace PM.Controllers
         {
             if (ModelState.IsValid)
             {
-                var isValid = _categoryService.Create(model);
+                var isValid = false;
+                var msg = "";
+                if (model.CategoryId > 0)
+                {
+                    var cate = _categoryService.Get(model.CategoryId);
+                    if(cate != null)
+                    {
+                        cate.CategoryName = model.CategoryName;
+                        cate.Description = model.Description;
+                        isValid = _categoryService.Update(cate);
+                        msg = "Đã cập nhật ngành hàng thành công!";
+                    }
+                }
+                else
+                {
+                    isValid = _categoryService.Create(model);
+                    msg = "Đã tạo ngành hàng thành công!";
+                }
+
                 if (isValid)
                 {
-                    ViewBag.Msg = "Đã tạo ngành hàng thành công!";
+                    ViewBag.Msg = msg;
                     ModelState.Remove("InvalidAuth");
                 }
                 else
                 {
-                    ModelState.AddModelError("InvalidAuth", "Tên đăng nhập hoặc mật khẩu không chính xác");
+                    ModelState.AddModelError("InvalidAuth", "Đã có lỗi xảy ra, liên hệ IT.");
                 }
                 return View(model);
             }
@@ -54,6 +77,20 @@ namespace PM.Controllers
         public IActionResult Listing()
         {
             return View(_categoryService.GetAll());
+        }
+        public IActionResult Delete(int cateId)
+        {
+            var model = new ProductCategory();
+            if (cateId > 0)
+            {
+                model = _categoryService.Get(cateId);
+                if(model != null)
+                {
+                    model.IsDelete = true;
+                    _categoryService.Update(model);
+                }
+            }
+            return RedirectToAction("Listing");
         }
     }
 }
