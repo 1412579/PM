@@ -44,6 +44,7 @@ namespace PM.Models
         public virtual DbSet<ProductCategory> ProductCategory { get; set; }
         public virtual DbSet<ProductPicture> ProductPicture { get; set; }
         public virtual DbSet<Products> Products { get; set; }
+        public virtual DbSet<ProductUnit> ProductUnit { get; set; }
         public virtual DbSet<RequestMoney> RequestMoney { get; set; }
         public virtual DbSet<Settings> Settings { get; set; }
         public virtual DbSet<Slug> Slug { get; set; }
@@ -616,6 +617,23 @@ namespace PM.Models
                     .IsUnicode(false);
 
                 entity.Property(e => e.ViewDoping).HasDefaultValueSql("((0))");
+            });
+
+            modelBuilder.Entity<ProductUnit>(entity =>
+            {
+                entity.HasKey(e => e.UnitId);
+
+                entity.Property(e => e.UnitId).HasColumnName("UnitID");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(500);
+
+                entity.Property(e => e.UnitName).HasMaxLength(255);
+
+                entity.Property(e => e.Url)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
             });
 
             modelBuilder.Entity<RequestMoney>(entity =>

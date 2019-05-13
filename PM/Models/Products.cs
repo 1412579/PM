@@ -10,6 +10,7 @@ namespace PM.Models
         public string ProductName { get; set; }
         public string SeoName { get; set; }
         public int? CategoryId { get; set; }
+        public int? UnitId { get; set; }
         public string Simage { get; set; }
         public string Mimage { get; set; }
         public string Bimage { get; set; }
