@@ -10,7 +10,7 @@ using PM.lib;
 using Microsoft.AspNetCore.Authorization;
 namespace PM.Controllers
 {
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class HomeController : Controller
     {
         private readonly IAccountService _accountService;
@@ -27,7 +27,7 @@ namespace PM.Controllers
         public IActionResult Index()
         {
             //var ret = _accountService.Login("test", "test");
-            //var test = CrytoHelper.GetMD5Hash("test");
+            //var test = CrytoHelper.GetMD5Hash("1");
             //var temp = CrytoHelper.GetMD5Hash("test");
             return View();
         }

@@ -37,7 +37,7 @@ namespace PM
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-            //dependecy injection
+            //dependency injection
             services.AddSingleton<ICategoryService, CategoryService>();
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<IUnitOfWork, UnitOfWork>();

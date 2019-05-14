@@ -40,10 +40,10 @@ namespace PM.Controllers
         {
             if (ModelState.IsValid)
             {
-                var isValid = IsAuthenticated(model.Username, model.Password);
-                if (isValid)
+                var User = IsAuthenticated(model.Username, model.Password);
+                if (User != null)
                 {
-                    await LoginAsync(model);
+                    await LoginAsync(User);
                     if (IsUrlValid(model.RequestPath))
                     {
                         return Redirect(model.RequestPath);
@@ -59,13 +59,12 @@ namespace PM.Controllers
         {
             await HttpContext.SignOutAsync(
                     scheme: CookieAuthenticationDefaults.AuthenticationScheme);
-
-            return RedirectToAction("Login");
+            return RedirectToAction("Index");
         }
 
-        private bool IsAuthenticated(string Username, string Password)
+        private Users IsAuthenticated(string Username, string Password)
         {
-            return _accountService.Login(Username, Password) != null;
+            return _accountService.Login(Username, Password);
         }
         public IActionResult Access()
         {
@@ -78,11 +77,13 @@ namespace PM.Controllers
                    && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative);
         }
 
-        private async Task LoginAsync(LoginViewModel model)
+        private async Task LoginAsync(Users model)
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, model.Username),
+                new Claim(ClaimTypes.NameIdentifier, model.UserId.ToString()),
+                new Claim(ClaimTypes.Name, model.UserName),
+                new Claim(ClaimTypes.UserData, model.FullName),
                 new Claim(ClaimTypes.Role, "Admin"),
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

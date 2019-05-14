@@ -12,9 +12,9 @@ using PM.Models;
 namespace PM.Controllers
 {
     [AllowAnonymous]
-    public class CategoryController : Controller
+    public class UnitController : Controller
     {
-        private readonly ICategoryService _categoryService;
+        private readonly IUnitService _unitController;
         //private readonly IHttpContextAccessor _httpContextAccessor;
         //private ISession _session => _httpContextAccessor.HttpContext.Session;
         /// <summary>
@@ -23,41 +23,41 @@ namespace PM.Controllers
         /// <param name="accountService"></param>
         /// <param name="LogLoginService"></param>
         /// <returns></returns>
-        public CategoryController(ICategoryService categoryService)
+        public UnitController(IUnitService unitService)
         {
-            this._categoryService = categoryService;
+            this._unitController = unitService;
         }
-        public IActionResult AddEdit(int cateId)
+        public IActionResult AddEdit(int Id)
         {
-            var model = new ProductCategory();
-            if (cateId > 0)
+            var model = new ProductUnit();
+            if (Id > 0)
             {
-                model = _categoryService.Get(cateId);
+                model = _unitController.Get(Id);
             }
             return View(model);
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult AddEdit(ProductCategory model)
+        public IActionResult AddEdit(ProductUnit model)
         {
             if (ModelState.IsValid)
             {
                 var isValid = false;
                 var msg = "";
-                if (model.CategoryId > 0)
+                if (model.UnitId > 0)
                 {
-                    var cate = _categoryService.Get(model.CategoryId);
+                    var cate = _unitController.Get(model.UnitId);
                     if(cate != null)
                     {
-                        cate.CategoryName = model.CategoryName;
+                        cate.UnitName = model.UnitName;
                         cate.Description = model.Description;
-                        isValid = _categoryService.Update(cate);
+                        isValid = _unitController.Update(cate);
                         msg = "Đã cập nhật ngành hàng thành công!";
                     }
                 }
                 else
                 {
-                    isValid = _categoryService.Create(model);
+                    isValid = _unitController.Create(model);
                     msg = "Đã tạo ngành hàng thành công!";
                 }
 
@@ -70,25 +70,24 @@ namespace PM.Controllers
                 {
                     ModelState.AddModelError("InvalidAuth", "Đã có lỗi xảy ra, liên hệ IT.");
                 }
-                model.CategoryId = 0;
                 return View(model);
             }
             return View(model);
         }
         public IActionResult Listing()
         {
-            return View(_categoryService.GetAll());
+            return View(_unitController.GetAll());
         }
-        public IActionResult Delete(int cateId)
+        public IActionResult Delete(int Id)
         {
-            var model = new ProductCategory();
-            if (cateId > 0)
+            var model = new ProductUnit();
+            if (Id > 0)
             {
-                model = _categoryService.Get(cateId);
+                model = _unitController.Get(Id);
                 if(model != null)
                 {
                     model.IsDelete = true;
-                    _categoryService.Update(model);
+                    _unitController.Update(model);
                 }
             }
             return RedirectToAction("Listing");

@@ -15,6 +15,7 @@ using Newtonsoft.Json.Converters;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace PM.lib
 {
@@ -30,6 +31,7 @@ namespace PM.lib
                 return Debugger.IsAttached;
             }
         }
+
     }
 
     public static class SessionExtensions
@@ -46,4 +48,7 @@ namespace PM.lib
             return value == null ? default(T) : JsonConvert.DeserializeObject<T>(value);
         }
     }
+
+
+
 }
