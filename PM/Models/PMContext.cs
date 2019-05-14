@@ -589,6 +589,8 @@ namespace PM.Models
                     .HasMaxLength(500)
                     .IsUnicode(false);
 
+                entity.Property(e => e.Price).HasColumnType("decimal(18, 0)");
+
                 entity.Property(e => e.ProductCode)
                     .HasMaxLength(50)
                     .IsUnicode(false);
@@ -596,6 +598,8 @@ namespace PM.Models
                 entity.Property(e => e.ProductName).HasMaxLength(255);
 
                 entity.Property(e => e.Promotion).HasMaxLength(255);
+
+                entity.Property(e => e.SalePrice).HasColumnType("decimal(18, 0)");
 
                 entity.Property(e => e.SeoName).HasMaxLength(255);
 
@@ -608,7 +612,9 @@ namespace PM.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.TokenPrice).HasDefaultValueSql("((0))");
+                entity.Property(e => e.TokenPrice)
+                    .HasColumnType("decimal(18, 0)")
+                    .HasDefaultValueSql("((0))");
 
                 entity.Property(e => e.UpdateDate).HasColumnType("datetime");
 

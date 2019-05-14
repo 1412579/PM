@@ -14,7 +14,7 @@ namespace PM.Controllers
     [AllowAnonymous]
     public class UnitController : Controller
     {
-        private readonly IUnitService _unitController;
+        private readonly IUnitService _unitService;
         //private readonly IHttpContextAccessor _httpContextAccessor;
         //private ISession _session => _httpContextAccessor.HttpContext.Session;
         /// <summary>
@@ -25,14 +25,14 @@ namespace PM.Controllers
         /// <returns></returns>
         public UnitController(IUnitService unitService)
         {
-            this._unitController = unitService;
+            this._unitService = unitService;
         }
-        public IActionResult AddEdit(int Id)
+        public IActionResult AddEdit(int modelId)
         {
             var model = new ProductUnit();
-            if (Id > 0)
+            if (modelId > 0)
             {
-                model = _unitController.Get(Id);
+                model = _unitService.Get(modelId);
             }
             return View(model);
         }
@@ -46,19 +46,19 @@ namespace PM.Controllers
                 var msg = "";
                 if (model.UnitId > 0)
                 {
-                    var cate = _unitController.Get(model.UnitId);
+                    var cate = _unitService.Get(model.UnitId);
                     if(cate != null)
                     {
                         cate.UnitName = model.UnitName;
                         cate.Description = model.Description;
-                        isValid = _unitController.Update(cate);
-                        msg = "Đã cập nhật ngành hàng thành công!";
+                        isValid = _unitService.Update(cate);
+                        msg = "Đã cập nhật đơn vị thành công!";
                     }
                 }
                 else
                 {
-                    isValid = _unitController.Create(model);
-                    msg = "Đã tạo ngành hàng thành công!";
+                    isValid = _unitService.Create(model);
+                    msg = "Đã tạo đơn vị thành công!";
                 }
 
                 if (isValid)
@@ -70,24 +70,25 @@ namespace PM.Controllers
                 {
                     ModelState.AddModelError("InvalidAuth", "Đã có lỗi xảy ra, liên hệ IT.");
                 }
+                model.UnitId = 0;
                 return View(model);
             }
             return View(model);
         }
         public IActionResult Listing()
         {
-            return View(_unitController.GetAll());
+            return View(_unitService.GetAll());
         }
         public IActionResult Delete(int Id)
         {
             var model = new ProductUnit();
             if (Id > 0)
             {
-                model = _unitController.Get(Id);
+                model = _unitService.Get(Id);
                 if(model != null)
                 {
                     model.IsDelete = true;
-                    _unitController.Update(model);
+                    _unitService.Update(model);
                 }
             }
             return RedirectToAction("Listing");

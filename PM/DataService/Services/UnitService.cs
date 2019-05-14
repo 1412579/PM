@@ -12,7 +12,7 @@ namespace DataService.Services
     public class UnitService : IUnitService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<ProductUnit> _productCategoryRepository;
+        private readonly IRepository<ProductUnit> _productUnitRepository;
         /// <summary>
         /// Hàm khởi tạo
         /// </summary>
@@ -20,14 +20,14 @@ namespace DataService.Services
         public UnitService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _productCategoryRepository = _unitOfWork.Repository<ProductUnit>();
+            _productUnitRepository = _unitOfWork.Repository<ProductUnit>();
         }
 
         public bool Create(ProductUnit unit)
         {
             try
             {
-                _productCategoryRepository.Add(unit);
+                _productUnitRepository.Add(unit);
                 _unitOfWork.SaveChange();
                 return true;
             }
@@ -39,14 +39,14 @@ namespace DataService.Services
 
         public ProductUnit Get(int idp)
         {
-            return _productCategoryRepository.Get(x=>x.UnitId == idp && x.IsDelete != true);
+            return _productUnitRepository.Get(x=>x.UnitId == idp && x.IsDelete != true);
         }
 
         public List<ProductUnit> GetAll(int page = -1, int size = 10)
         {
             try
             {
-                var rsl = _productCategoryRepository.GetAll(x => x.IsDelete != true);
+                var rsl = _productUnitRepository.GetAll(x => x.IsDelete != true);
                 if(rsl != null && rsl.Any())
                 {
                     if (page == -1)
@@ -66,7 +66,7 @@ namespace DataService.Services
         {
             try
             {
-                _productCategoryRepository.Update(model);
+                _productUnitRepository.Update(model);
                 _unitOfWork.SaveChange();
                 return true;
             }

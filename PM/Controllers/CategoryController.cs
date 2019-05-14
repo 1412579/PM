@@ -27,12 +27,12 @@ namespace PM.Controllers
         {
             this._categoryService = categoryService;
         }
-        public IActionResult AddEdit(int cateId)
+        public IActionResult AddEdit(int modelId)
         {
             var model = new ProductCategory();
-            if (cateId > 0)
+            if (modelId > 0)
             {
-                model = _categoryService.Get(cateId);
+                model = _categoryService.Get(modelId);
             }
             return View(model);
         }

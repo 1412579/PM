@@ -9,25 +9,25 @@ using PM.Models;
 
 namespace DataService.Services
 {
-    public class CategoryService : ICategoryService
+    public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<ProductCategory> _productCategoryRepository;
+        private readonly IRepository<Products> _productRepositor;
         /// <summary>
         /// Hàm khởi tạo
         /// </summary>
         /// <param name="unitOfWork"></param>
-        public CategoryService(IUnitOfWork unitOfWork)
+        public ProductService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _productCategoryRepository = _unitOfWork.Repository<ProductCategory>();
+            _productRepositor = _unitOfWork.Repository<Products>();
         }
 
-        public bool Create(ProductCategory category)
+        public bool Create(Products model)
         {
             try
             {
-                _productCategoryRepository.Add(category);
+                _productRepositor.Add(model);
                 _unitOfWork.SaveChange();
                 return true;
             }
@@ -37,17 +37,22 @@ namespace DataService.Services
             }
         }
 
-        public ProductCategory Get(int idp)
+        public Products Get(long idp)
         {
-            return _productCategoryRepository.Get(x=>x.CategoryId == idp && (x.IsDelete != true));
+            return _productRepositor.Get(x => x.ProductId == idp && x.IsDelete != true);
         }
 
-        public List<ProductCategory> GetAll(int page = -1, int size = 10)
+        public Products GetByCode(string code)
+        {
+            return _productRepositor.Get(x => x.ProductCode == code && x.IsDelete != true);
+        }
+
+        public List<Products> GetAll(int page = -1, int size = 10)
         {
             try
             {
-                var rsl = _productCategoryRepository.GetAll(x => x.IsDelete != true);
-                if(rsl != null && rsl.Any())
+                var rsl = _productRepositor.GetAll(x => x.IsDelete != true);
+                if (rsl != null && rsl.Any())
                 {
                     if (page == -1)
                         return rsl.ToList();
@@ -62,16 +67,16 @@ namespace DataService.Services
             }
         }
 
-        public List<ProductCategory> Search(string keyWord)
+        public List<Products> Search(string keyWord)
         {
             throw new NotImplementedException();
         }
 
-        public bool Update(ProductCategory model)
+        public bool Update(Products model)
         {
             try
             {
-                _productCategoryRepository.Update(model);
+                _productRepositor.Update(model);
                 _unitOfWork.SaveChange();
                 return true;
             }

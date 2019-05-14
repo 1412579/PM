@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using System.Diagnostics;
 using System.Security.Claims;
+using System.Globalization;
 
 namespace PM.lib
 {
@@ -30,6 +31,41 @@ namespace PM.lib
             {
                 return Debugger.IsAttached;
             }
+        }
+        public static bool IsNumericType(this object o)
+        {
+            switch (Type.GetTypeCode(o.GetType()))
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.UInt16:
+                case TypeCode.UInt32:
+                case TypeCode.UInt64:
+                case TypeCode.Int16:
+                case TypeCode.Int32:
+                case TypeCode.Int64:
+                case TypeCode.Decimal:
+                case TypeCode.Double:
+                case TypeCode.Single:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        private static string FormatNumber(this object value, string format)
+        {
+            if (!value.IsNumericType())
+                throw new ArgumentException("\"" + value + "\" is not a number.");
+
+            var result = string.Format(CultureInfo.GetCultureInfo("vi-VN"), format, value);
+            if (result.StartsWith("0"))
+                return string.Empty;
+            return result;
+        }
+
+        public static string ToCurrency(this object number)
+        {
+            return number.FormatNumber("{0:c0}");
         }
 
     }

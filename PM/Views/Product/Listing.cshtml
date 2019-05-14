@@ -1,5 +1,6 @@
 ﻿@using PM.Models
-@model List<ProductUnit>
+@using PM.lib
+@model List<ProductView>
 @{
 }
 
@@ -19,7 +20,7 @@
     <div class="">
         <div class="page-title">
             <div class="title_left">
-                <h3>Đơn vị sản phẩm</h3>
+                <h3>Sản phẩm</h3>
             </div>
         </div>
 
@@ -28,15 +29,20 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h2>Danh sách đơn vị sản phẩm</h2>
+                        <h2>Danh sách sản phẩm</h2>
                         <div class="clearfix"></div>
                     </div>
                     <div class="x_content">
                         <table id="listing" class="table table-striped table-bordered bulk_action">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Tên ngành hàng</th>
+                                    <th>ID WEB</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá bán lẻ</th>
+                                    <th>Giá bán buôn</th>
+                                    <th>Đơn vị</th>
+                                    <th>Ngành hàng</th>
                                     <th>Thao tác</th>
                                 </tr>
                             </thead>
@@ -46,10 +52,16 @@
                                 {
                                     foreach (var item in Model)
                                     {
+                                        var pro = item.Product;
                                         <tr>
-                                            <td>@item.UnitId</td>
-                                            <td>@item.UnitName</td>
-                                            <td><a asp-controller="Unit" asp-action="AddEdit" asp-route-modelId="@item.UnitId" class="btn btn-primary">Sửa</a> <a asp-controller="Unit" asp-action="Delete" asp-route-modelId="@item.UnitId" class="btn btn-danger">Xoá</a></td>
+                                            <td>@pro.ProductId</td>
+                                            <td>@pro.ProductCode</td>
+                                            <td>@pro.ProductName</td>
+                                            <td>@pro.Price.ToCurrency()</td>
+                                            <td>@pro.SalePrice.ToCurrency()</td>
+                                            <td>@(item.Unit != null ? item.Unit.UnitName : "Chưa chọn đơn vị")</td>
+                                            <td>@(item.Category != null ? item.Category.CategoryName : "Chưa chọn ngành hàng")</td>
+                                            <td><a asp-controller="Product" asp-action="AddEdit" asp-route-modelId="@pro.ProductId" class="btn btn-primary">Sửa</a> <a asp-controller="Product" asp-action="Delete" asp-route-modelId="@pro.ProductId" class="btn btn-danger">Xoá</a></td>
                                         </tr>
                                     }
                                 }
