@@ -14,5 +14,7 @@ namespace DataService.Interfaces
         bool Create(Products product);
         bool Update(Products product);
         Products GetByCode(string code);
+        List<ProductView> BuildProductsListing();
+        ProductView GetFullProductById(int id);
     }
 }

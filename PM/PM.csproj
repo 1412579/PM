@@ -206,6 +206,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Import\AddEdit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Import\Listing.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Product\Listing.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -227,6 +233,10 @@
     <Content Update="Views\Product\AddEdit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Adapter\" />
   </ItemGroup>
 
 </Project>

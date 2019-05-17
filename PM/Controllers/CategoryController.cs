@@ -44,7 +44,8 @@ namespace PM.Controllers
             {
                 var isValid = false;
                 var msg = "";
-                if (model.CategoryId > 0)
+                var IsEdit = model.CategoryId > 0;
+                if (IsEdit)
                 {
                     var cate = _categoryService.Get(model.CategoryId);
                     if(cate != null)
@@ -65,12 +66,13 @@ namespace PM.Controllers
                 {
                     ViewBag.Msg = msg;
                     ModelState.Remove("InvalidAuth");
+                    if(!IsEdit)
+                    model = new ProductCategory();
                 }
                 else
                 {
                     ModelState.AddModelError("InvalidAuth", "Đã có lỗi xảy ra, liên hệ IT.");
                 }
-                model.CategoryId = 0;
                 return View(model);
             }
             return View(model);

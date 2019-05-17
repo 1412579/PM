@@ -12,26 +12,32 @@ namespace DataService.Services
     public class ProductService : IProductService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<Products> _productRepositor;
+        private readonly IRepository<Products> _productRepository;
+        private readonly ICategoryService _categoryService;
+        private readonly IUnitService _unitService;
+
+
         /// <summary>
         /// Hàm khởi tạo
         /// </summary>
         /// <param name="unitOfWork"></param>
-        public ProductService(IUnitOfWork unitOfWork)
+        public ProductService(IUnitOfWork unitOfWork, ICategoryService categoryService, IUnitService unitService)
         {
             _unitOfWork = unitOfWork;
-            _productRepositor = _unitOfWork.Repository<Products>();
+            _productRepository = _unitOfWork.Repository<Products>();
+            _unitService = unitService;
+            _categoryService = categoryService;
         }
 
         public bool Create(Products model)
         {
             try
             {
-                _productRepositor.Add(model);
+                _productRepository.Add(model);
                 _unitOfWork.SaveChange();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 return false;
             }
@@ -39,19 +45,19 @@ namespace DataService.Services
 
         public Products Get(long idp)
         {
-            return _productRepositor.Get(x => x.ProductId == idp && x.IsDelete != true);
+            return _productRepository.Get(x => x.ProductId == idp && x.IsDelete != true);
         }
 
         public Products GetByCode(string code)
         {
-            return _productRepositor.Get(x => x.ProductCode == code && x.IsDelete != true);
+            return _productRepository.Get(x => x.ProductCode == code && x.IsDelete != true);
         }
 
         public List<Products> GetAll(int page = -1, int size = 10)
         {
             try
             {
-                var rsl = _productRepositor.GetAll(x => x.IsDelete != true);
+                var rsl = _productRepository.GetAll(x => x.IsDelete != true);
                 if (rsl != null && rsl.Any())
                 {
                     if (page == -1)
@@ -76,7 +82,7 @@ namespace DataService.Services
         {
             try
             {
-                _productRepositor.Update(model);
+                _productRepository.Update(model);
                 _unitOfWork.SaveChange();
                 return true;
             }
@@ -84,6 +90,38 @@ namespace DataService.Services
             {
                 return false;
             }
+        }
+        public List<ProductView> BuildProductsListing()
+        {
+            var rsl = new List<ProductView>();
+            var products = GetAll();
+            if (products != null && products.Any())
+            {
+                var cates = _categoryService.GetAll();
+                var units = _unitService.GetAll();
+                foreach (var item in products)
+                {
+                    var model = new ProductView();
+                    model.Product = item;
+                    model.Category = cates.FirstOrDefault(x => x.CategoryId == item.CategoryId) ?? null;
+                    model.Unit = units.FirstOrDefault(x => x.UnitId == item.UnitId) ?? null;
+                    rsl.Add(model);
+                }
+            }
+            return rsl;
+        }
+        public ProductView GetFullProductById(int id)
+        {
+            var products = Get(id);
+            if(products != null)
+            {
+                var model = new ProductView();
+                model.Product = products;
+                model.Category = _categoryService.Get(products.CategoryId.Value);
+                model.Unit = _unitService.Get(products.UnitId.Value);
+                return model;
+            }
+            return null;
         }
     }
 }

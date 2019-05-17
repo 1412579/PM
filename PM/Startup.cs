@@ -42,6 +42,7 @@ namespace PM
             services.AddSingleton<IUnitService, UnitService>();
             services.AddSingleton<IAccountService, AccountService>();
             services.AddSingleton<IProductService, ProductService>();
+            services.AddSingleton<IImportService, ImportService>();
             services.AddSingleton<IUnitOfWork, UnitOfWork>();
 
             services.AddMvc(options => options.Filters.Add(new AuthorizeFilter())).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

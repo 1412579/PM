@@ -42,6 +42,7 @@ namespace PM.Models
         public virtual DbSet<PostReport> PostReport { get; set; }
         public virtual DbSet<PostShare> PostShare { get; set; }
         public virtual DbSet<ProductCategory> ProductCategory { get; set; }
+        public virtual DbSet<ProductImport> ProductImport { get; set; }
         public virtual DbSet<ProductPicture> ProductPicture { get; set; }
         public virtual DbSet<Products> Products { get; set; }
         public virtual DbSet<ProductUnit> ProductUnit { get; set; }
@@ -522,6 +523,23 @@ namespace PM.Models
                 entity.Property(e => e.Url)
                     .HasMaxLength(500)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<ProductImport>(entity =>
+            {
+                entity.HasKey(e => e.ImportId);
+
+                entity.Property(e => e.ImportId).HasColumnName("ImportID");
+
+                entity.Property(e => e.CreateDate).HasColumnType("datetime");
+
+                entity.Property(e => e.Description).HasMaxLength(500);
+
+                entity.Property(e => e.ImportDate).HasColumnType("datetime");
+
+                entity.Property(e => e.ImportFrom).HasMaxLength(255);
+
+                entity.Property(e => e.Price).HasColumnType("decimal(18, 0)");
             });
 
             modelBuilder.Entity<ProductPicture>(entity =>

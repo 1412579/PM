@@ -19,6 +19,7 @@ namespace PM.Controllers
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
         private readonly IUnitService _unitService;
+        private readonly IImportService _importService;
         //private readonly IHttpContextAccessor _httpContextAccessor;
         //private ISession _session => _httpContextAccessor.HttpContext.Session;
         /// <summary>
@@ -27,11 +28,12 @@ namespace PM.Controllers
         /// <param name="accountService"></param>
         /// <param name="LogLoginService"></param>
         /// <returns></returns>
-        public ProductController(IProductService productService, ICategoryService categoryService, IUnitService unitService)
+        public ProductController(IProductService productService, ICategoryService categoryService, IUnitService unitService, IImportService importService)
         {
             this._productService = productService;
             this._categoryService = categoryService;
             this._unitService = unitService;
+            this._importService = importService;
         }
         public IActionResult AddEdit(int modelId)
         {
@@ -39,14 +41,15 @@ namespace PM.Controllers
             if (modelId > 0)
             {
                 model = _productService.Get(modelId);
+                if (model != null)
+                    ViewBag.ListImport = _importService.GetAllByProductId(modelId);
             }
-           
+
             var ListCate = new List<SelectListItem>();
             var ListUnit = new List<SelectListItem>();
             BuildCatesAndUnits(model, ref ListCate,ref ListUnit);
             ViewBag.ListCate = ListCate.ToArray();
             ViewBag.ListUnit = ListUnit.ToArray();
-
             return View(model);
         }
         [HttpPost]
@@ -67,7 +70,8 @@ namespace PM.Controllers
                     ModelState.AddModelError("InvalidAuth", "Mã sản phẩm nhập đã tồn tại!");
                     return View(model);
                 }
-                if (model.ProductId > 0)
+                var IsEdit = model.ProductId > 0;
+                if (IsEdit)
                 {
                     var pro = _productService.Get(model.ProductId);
                     if (pro != null)
@@ -93,12 +97,14 @@ namespace PM.Controllers
                 {
                     ViewBag.Msg = msg;
                     ModelState.Remove("InvalidAuth");
+                    if(!IsEdit)
+                    model = new Products();
                 }
                 else
                 {
                     ModelState.AddModelError("InvalidAuth", "Đã có lỗi xảy ra, liên hệ IT.");
                 }
-                model.ProductId = 0;
+                //model.ProductId = 0;
                 
                 return View(model);
             }
@@ -106,7 +112,7 @@ namespace PM.Controllers
         }
         public IActionResult Listing()
         {
-            var model = BuildProductsListing();
+            var model = _productService.BuildProductsListing();
             return View(model);
         }
         public IActionResult Delete(int Id)
@@ -124,25 +130,25 @@ namespace PM.Controllers
             return RedirectToAction("Listing");
         }
 
-        private List<ProductView> BuildProductsListing()
-        {
-            var rsl = new List<ProductView>();
-            var products = _productService.GetAll();
-            if(products != null && products.Any())
-            {
-                var cates = _categoryService.GetAll();
-                var units = _unitService.GetAll();
-                foreach(var item in products)
-                {
-                    var model = new ProductView();
-                    model.Product = item;
-                    model.Category = cates.FirstOrDefault(x=>x.CategoryId == item.CategoryId) ?? null;
-                    model.Unit = units.FirstOrDefault(x => x.UnitId == item.UnitId) ?? null;
-                    rsl.Add(model);
-                }
-            }
-            return rsl;
-        }
+        //private List<ProductView> BuildProductsListing()
+        //{
+        //    var rsl = new List<ProductView>();
+        //    var products = _productService.GetAll();
+        //    if(products != null && products.Any())
+        //    {
+        //        var cates = _categoryService.GetAll();
+        //        var units = _unitService.GetAll();
+        //        foreach(var item in products)
+        //        {
+        //            var model = new ProductView();
+        //            model.Product = item;
+        //            model.Category = cates.FirstOrDefault(x=>x.CategoryId == item.CategoryId) ?? null;
+        //            model.Unit = units.FirstOrDefault(x => x.UnitId == item.UnitId) ?? null;
+        //            rsl.Add(model);
+        //        }
+        //    }
+        //    return rsl;
+        //}
 
         private bool IsExistProductCode(Products model)
         {
