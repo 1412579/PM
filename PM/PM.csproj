@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Adapter\**" />
+    <Content Remove="Adapter\**" />
+    <EmbeddedResource Remove="Adapter\**" />
+    <None Remove="Adapter\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="wwwroot\vendors\parsleyjs\bower_components\bootstrap\bower.json" />
     <Content Include="wwwroot\vendors\parsleyjs\bower_components\bootstrap\dist\css\bootstrap-theme.css" />
     <Content Include="wwwroot\vendors\parsleyjs\bower_components\bootstrap\dist\css\bootstrap-theme.min.css" />
@@ -212,6 +219,9 @@
     <Content Update="Views\Import\Listing.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Product\Order.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Product\Listing.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -233,10 +243,6 @@
     <Content Update="Views\Product\AddEdit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Adapter\" />
   </ItemGroup>
 
 </Project>

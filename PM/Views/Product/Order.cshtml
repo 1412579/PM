@@ -1,0 +1,406 @@
+﻿@using PM.Models
+@using PM.lib
+@model Products
+@{
+    var displayText = "Xuất hàng";
+}
+
+@section css{
+<style>
+    #ProductResult{
+        left: 10px;
+        width: calc(100% - 20px);
+        max-height: 250px;
+        overflow: auto;
+    }
+
+    #ProductResult li{
+        padding: 10px;
+        color: #333;
+        cursor: pointer;
+    }
+
+        #ProductResult li:hover {
+            background: #e5e5e5;
+        }
+
+    </style>
+
+}
+
+@section js{
+    <script>
+        var IsLoading = false;
+        $(document).ready(function () {
+            $('#phoneSearch').keyup(function () {
+                var phone = $(this).val();
+                if (phone.length == 10)
+                    searchCustomer(phone);
+                else if (phone.length > 10)
+                    $('#phoneSearch').val(phone.slice(0, 10));
+            });
+            $('#SearchProduct').keydown(function () {
+                var keyword = $(this).val();
+                if (keyword.length >= 3)
+                    searchProduct(keyword);
+            });
+            
+        });
+        function searchCustomer(phone) {
+            if (IsLoading)
+                return;
+            IsLoading = true;
+            $.ajax({
+                type: 'POST',
+                async: true,
+                url: '/Product/SearchCustomer',
+                data: {
+                    phone: phone,
+                },
+                success: function (data) {
+                    var phoneMsg = $('#phoneMsg');
+                    if (data.status == 1) {
+                        var res = JSON.parse(data.data);
+                        //$('#phoneSearch').val(res.Phone);
+                        $('#CustomerName').val(res.FullName);
+                        $('#CustomerAddress').val(res.Address);
+                        $('#CustomerNote').val(res.Contents);
+                    }
+                    else {
+                        phoneMsg.text('Số điện thoại chưa có thông tin, vui lòng nhập.');
+                    }
+                },
+                fail: function (xhr, textStatus, errorThrown) {
+                },
+                complete: function (xhr, textStatus, errorThrown) {
+                    IsLoading = false;
+                }
+            });
+        }
+
+        function searchProduct(keyword) {
+            if (IsLoading)
+                return;
+            IsLoading = true;
+            $.ajax({
+                type: 'POST',
+                async: true,
+                url: '/Product/SearchProduct',
+                data: {
+                    keyword: keyword,
+                },
+                success: function (data) {
+                    var ProductResult = $('#ProductResult');
+                    if (data.status == 1) {
+                        var res = JSON.parse(data.data);
+                        console.log(res);
+                        var stringRsl = ""; 
+                        $.each(res, function (index,item) {
+                            stringRsl += "<li data-pro='" + JSON.stringify(item) +"' onclick=chooseProduct(this); >" + item.Product.ProductId + " - " + item.Product.ProductCode  +" - " + item.Product.ProductName + "</li>";
+                        });
+                        stringRsl += stringRsl;
+                        stringRsl += stringRsl;
+                        stringRsl += stringRsl;
+                        stringRsl += stringRsl;
+                        stringRsl += stringRsl;
+                        stringRsl += stringRsl;
+                        ProductResult.html(stringRsl);
+                    }
+                    else {
+                        ProductResult.html('<li>Không tìm thấy sản phẩm</li>');
+                    }
+                    ProductResult.show();
+                },
+                fail: function (xhr, textStatus, errorThrown) {
+                },
+                complete: function (xhr, textStatus, errorThrown) {
+                    IsLoading = false;
+                }
+            });
+        }
+
+        function chooseProduct(ele) {
+            debugger;
+            var data = $(ele).data('pro');
+        }
+
+        function createOrder() {
+            if (IsLoading) {
+                alert("Hệ thống đang xử lý, vui lòng không click nhiều!");
+                return;
+            }
+            //var username = $('#UserName').val();
+            var Phone = $('#phoneSearch').val();
+            var CustomerName = $('#CustomerName').val();
+            var CustomerAddress = $('#CustomerAddress').val();
+            var CustomerNote = $('#CustomerNote').val();
+
+            var phoneMsg = $('#phoneMsg').text('');
+            var nameMsg = $('#nameMsg').text('');
+            var addrMsg = $('#addrMsg').text('');
+            var flag = false;
+
+            //if (!username) {
+            //    userMsg.text("Vui lòng nhập tài khoản.");
+            //    flag = true;
+            //}
+            if (!Phone) {
+                phoneMsg.text("Vui lòng nhập số điện thoại.");
+                flag = true;
+            }
+            if (!CustomerName) {
+                nameMsg.text("Vui lòng nhập tên khách hàng");
+                flag = true;
+            }
+            if (!CustomerAddress) {
+                addrMsg.text("Vui lòng nhập tên địa chỉ khách hàng");
+                flag = true;
+            }
+
+            if (flag) {
+                return;
+            }
+            IsLoading = true;
+            var CustomerId = $('#CustomerId').val();
+            $.ajax({
+                type: 'POST',
+                async: true,
+                url: '/Product/CreateOrder',
+                data: {
+                    CustomerId: CustomerId,
+                    CustomerPhone: Phone,
+                    CustomerName: CustomerName,
+                    CustomerAddress: CustomerAddress,
+                    CustomerNote: CustomerNote,
+                },
+                success: function (data) {
+                    if (data.status == -1) {
+                        alert(data.Msg);
+                    }
+                    else {
+                        alert('Đã xuất đơn hàng thành công.');
+                        reloadLisstApi(UserId);
+                        //location.reload(false);
+                        //window.location.href = '/';
+                    }
+                },
+                fail: function (xhr, textStatus, errorThrown) {
+                    alert('Đã xảy ra lỗi, vui lòng thử lại sau.');
+                },
+                complete: function () {
+                    IsLoading = false;
+                }
+            });
+        }
+
+    </script>
+
+}
+
+<div class="right_col" role="main" style="min-height: 3539px;">
+    <div class="">
+        <div class="clearfix"></div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>@displayText @*<small>different form elements</small>*@</h2>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-2 col-xs-12" for="first-name">
+                                Số điện thoại <span class="required">*</span>
+                                <input type="hidden" id="CustomerId" value="" />
+                            </label>
+                            <div class="col-md-6 col-sm-6 col-xs-12">
+                                <input type="phone" name="" id="phoneSearch" class="form-control col-md-7 col-xs-12" value="" />
+                                <small class="text text-danger" id="phoneMsg">*Hệ thống sẽ tự tìm kiếm và hiển thị nếu số điện thoại đã có trong hệ thống</small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                                Tên khách hàng <span class="required">*</span>
+                            </label>
+                            <div class="col-md-10 col-sm-10 col-xs-12">
+                                <input type="text" name="" id="CustomerName" class="form-control col-md-7 col-xs-12" value="" />
+                                <small class="text text-danger" id="nameMsg"></small>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                                Địa chi <span class="required">*</span>
+                            </label>
+                            <div class="col-md-10 col-sm-10 col-xs-12">
+                                <input type="text" name="" id="CustomerAddress" class="form-control col-md-7 col-xs-12" value="" />
+                                <small class="text text-danger" id="addrMsg"></small>
+                            </div>
+                            @*<label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                                    Số điện thoại  <span class="required">*</span>
+                                </label>
+                                <div class="col-md-4 col-sm-4 col-xs-12">
+                                    <input type="text" name="" id="" class="form-control col-md-7 col-xs-12" value="" />
+                                </div>*@
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-2 col-sm-2 col-xs-12" for="first-name">
+                                Ghi chú
+                            </label>
+                            <div class="col-md-6 col-sm-10 col-xs-12">
+                                <input type="text" name="" id="CustomerNote" class="form-control col-md-7 col-xs-12" value="" />
+                            </div>
+                        </div>
+                        <div class="ln_solid"></div>
+                        <div class="form-group">
+                            <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                                <button onclick="return createOrder();" class="btn btn-success">Tạo đơn xuất</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                    <div class="x_title">
+                        <h2>Danh sách sản phẩm xuất</h2>
+                        <a style="float:right;" class="btn btn-primary"  data-toggle="modal" data-target=".addpro" data-backdrop="static">Thêm sản phẩm</a>
+                        <div class="clearfix"></div>
+                        @*<div class="row">
+                                <h4 class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                                    Tổng hàng còn:
+                                </h4>
+                                <h4 class="col-md-4 col-sm-4 col-xs-12 text text-success" id="Impression_1009">@ListImport.Sum(x => x.Quantity)</h4>
+                            </div>*@
+                    </div>
+                    <div class="x_content">
+                        <table id="listing" class="table table-striped table-bordered bulk_action">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Mã sản phẩm</th>
+                                    <th>Tên Sản phẩm</th>
+                                    <th>Số lượng</th>
+                                    <th>Giá xuất</th>
+                                    <th>Tổng tiền xuất</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @*@if (ListImport != null && ListImport.Any())
+                                    {
+                                        foreach (var item in ListImport)
+                                        {
+                                            <tr>
+                                                <td>@item.ImportId</td>
+                                                <td>@item.ImportFrom</td>
+                                                <td>@item.Quantity</td>
+                                                <td>@item.Price.ToCurrency()</td>
+                                                <td>@item.ImportDate?.ToString("dd/MM/yyyy")</td>
+                                                <td>@((item.Quantity * item.Price).ToCurrency())</td>
+                                                <td><a asp-controller="Import" asp-action="AddEdit" asp-route-productId="@Model.ProductId" asp-route-importId="@item.ImportId" class="btn btn-primary">Sửa</a></td>
+                                            </tr>
+                                        }
+                                    }*@
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="modal fade addpro in" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">×</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Thêm sản phẩm</h4>
+            </div>
+            <div class="modal-body form-horizontal">
+                <div class="form-group">
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Tìm kiếm
+                    </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" id="SearchProduct" name="" required="required" type="text" value="">
+                        <ul class="dropdown-menu" id="ProductResult"></ul>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        ID Web
+                    </label>
+                    <div class="col-md-4 col-sm-4 col-xs-6">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" id="ProductId" disabled value="">
+                    </div>
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Product Code
+                    </label>
+                    <div class="col-md-4 col-sm-4 col-xs-6">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" id="ProductCode" disabled value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Tên sản phẩm
+                    </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" disabled value="" id="ProductName">
+                        <small class="text text-danger" id="etokenMsg"></small>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Ngành hàng
+                    </label>
+                    <div class="col-md-4 col-sm-4 col-xs-6">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" id="ProductCate" disabled value="">
+                    </div>
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Đơn vị
+                    </label>
+                    <div class="col-md-4 col-sm-4 col-xs-6">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" id="ProductUnit" disabled value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Số lượng tồn
+                    </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" disabled value="" id="ProductStock">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Số lượng bán ra
+                    </label>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input class="form-control col-md-7 col-xs-12 text-box single-line" value="" id="ProductSell">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <h5 class="control-label col-md-2 col-sm-2 col-xs-12 text text-success" for="last-name">
+                        Tổng tiền: 
+                    </h5>
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <h3 class="col-md-7 col-xs-12 text-box single-line text text-danger">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="return editAPI()">Xác nhận</button>
+            </div>
+
+        </div>
+    </div>
+</div>

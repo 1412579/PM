@@ -247,6 +247,8 @@ namespace PM.Models
             {
                 entity.Property(e => e.Id).HasColumnName("ID");
 
+                entity.Property(e => e.Address).HasMaxLength(100);
+
                 entity.Property(e => e.Contents).HasColumnType("ntext");
 
                 entity.Property(e => e.CreateDate).HasColumnType("datetime");

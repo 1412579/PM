@@ -10,7 +10,7 @@ using PM.lib;
 using Microsoft.AspNetCore.Authorization;
 using PM.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using Newtonsoft.Json;
 namespace PM.Controllers
 {
     [AllowAnonymous]
@@ -190,5 +190,130 @@ namespace PM.Controllers
             });
 
         }
+
+
+        public IActionResult Order()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult SearchCustomer(string phone)
+        {
+            var model = _productService.GetContactsByPhone(phone);
+            if(model != null)
+                return Json(new
+                {
+                    Status = 1,
+                    Data = JsonConvert.SerializeObject(model),
+                });
+            return Json(new
+            {
+                Status = -1,
+                Data = "",
+            });
+        }
+
+        [HttpPost]
+        public IActionResult SearchProduct(string keyword)
+        {
+            if (string.IsNullOrEmpty(keyword))
+                return null;
+            var model = _productService.SearchProduct(keyword);
+            if (model != null && model.Any())
+                return Json(new
+                {
+                    Status = 1,
+                    Data = JsonConvert.SerializeObject(model),
+                });
+            return Json(new
+            {
+                Status = -1,
+                Data = "",
+            });
+        }
+
+
+
+        [HttpPost]
+        public IActionResult CreateOrder(int CustomerId, string CustomerPhone, string CustomerName, string CustomerAddress, string CustomerNote)
+        {
+            bool IsSavedCustomer = false;
+            if(CustomerId == 0)
+            {
+                var newContact = new Contacts();
+                newContact.FullName = CustomerName;
+                newContact.Contents = CustomerNote;
+                newContact.Address = CustomerAddress;
+                newContact.Phone = CustomerPhone;
+                IsSavedCustomer = _productService.Create(newContact);
+            }
+
+            if (!IsSavedCustomer)
+            {
+                return Json(new
+                {
+                    Status = -1,
+                    Data = "Không lưu được thông tin khách hàng, vui lòng thử lại sau.",
+                });
+            }
+
+            return Json(new
+            {
+                Status = -1,
+                Data = "",
+            });
+        }
+
+        private void WriteCookie(string name, string value, int days = 10)
+        {
+            Response.Cookies.Append(name, value, new Microsoft.AspNetCore.Http.CookieOptions()
+            {
+                Expires = DateTime.Now.AddDays(days),
+            });
+        }
+
+        private void DeleteCookie(string name)
+        {
+            Response.Cookies.Append(name, "", new Microsoft.AspNetCore.Http.CookieOptions()
+            {
+                Expires = DateTime.Now.AddDays(-1),
+            });
+        }
+
+        private string ReadCookie(string name)
+        {
+            return Request.Cookies[name];
+        }
+
+        private List<ProductCart> GetCoreBrain()
+        {
+            var jsonCart = ReadCookie("PMCB");
+            if(!string.IsNullOrEmpty(jsonCart))
+            {
+                var lstPro = JsonConvert.DeserializeObject<List<CoreBrain>>(jsonCart);
+                if(lstPro != null && lstPro.Any())
+                {
+                    var listCarts = new List<ProductCart>();
+                    foreach(var item in lstPro)
+                    {
+                        var model = _productService.Get(item.ProductId);
+                        if(model != null)
+                        {
+                            var p = new ProductCart();
+                            p.Product = model;
+                            p.Quantity = item.Quantity;
+                            p.Price = model.Price.Value;
+                            listCarts.Add(p);
+                        }
+
+                    }
+                    return listCarts;
+                }
+                return null;
+            }
+            return null;
+        }
+
     }
 }

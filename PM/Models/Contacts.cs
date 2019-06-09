@@ -13,5 +13,6 @@ namespace PM.Models
         public string Contents { get; set; }
         public byte? Status { get; set; }
         public DateTime? CreateDate { get; set; }
+        public string Address { get; set; }
     }
 }

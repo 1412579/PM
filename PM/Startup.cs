@@ -28,6 +28,11 @@ namespace PM
 
         public IConfiguration Configuration { get; }
 
+        public class DatabaseOptions
+        {
+            public string ConnectionString { get; set; }
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -47,6 +52,7 @@ namespace PM
 
             services.AddMvc(options => options.Filters.Add(new AuthorizeFilter())).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
+            services.Configure<DatabaseOptions>(Configuration.GetSection("Data:PMDB"));
 
             ////authen
             services.AddAuthentication(options =>
@@ -79,6 +85,7 @@ namespace PM
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
+
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

@@ -13,6 +13,7 @@ namespace DataService.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Products> _productRepository;
+        private readonly IRepository<Contacts> _contactRepository;
         private readonly ICategoryService _categoryService;
         private readonly IUnitService _unitService;
 
@@ -25,6 +26,7 @@ namespace DataService.Services
         {
             _unitOfWork = unitOfWork;
             _productRepository = _unitOfWork.Repository<Products>();
+            _contactRepository = _unitOfWork.Repository<Contacts>();
             _unitService = unitService;
             _categoryService = categoryService;
         }
@@ -120,6 +122,36 @@ namespace DataService.Services
                 model.Category = _categoryService.Get(products.CategoryId.Value);
                 model.Unit = _unitService.Get(products.UnitId.Value);
                 return model;
+            }
+            return null;
+        }
+
+        public Contacts GetContactsByPhone(string phone)
+        {
+            return _contactRepository.Get(x => x.Phone == phone);
+        }
+
+        public bool Create(Contacts model)
+        {
+            try
+            {
+                _contactRepository.Add(model);
+                _unitOfWork.SaveChange();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
+        public List<ProductView> SearchProduct(string keyword)
+        {
+            keyword = keyword.ToLower();
+            var lstRsl = BuildProductsListing();
+            if(lstRsl != null && lstRsl.Any())
+            {
+                return lstRsl.Where(x => x.Product.ProductName.ToLower().Contains(keyword) || x.Product.ProductCode.ToLower().Contains(keyword) || x.Category.CategoryName.ToLower().Contains(keyword) || x.Product.ProductId.ToString().ToLower().Contains(keyword)).ToList();
             }
             return null;
         }

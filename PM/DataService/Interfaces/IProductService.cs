@@ -16,5 +16,10 @@ namespace DataService.Interfaces
         Products GetByCode(string code);
         List<ProductView> BuildProductsListing();
         ProductView GetFullProductById(int id);
+        List<ProductView> SearchProduct(string keyword);
+
+        Contacts GetContactsByPhone(string phone);
+        bool Create(Contacts product);
+
     }
 }

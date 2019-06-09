@@ -68,6 +68,8 @@ namespace PM.lib
             return number.FormatNumber("{0:c0}");
         }
 
+       
+
     }
 
     public static class SessionExtensions

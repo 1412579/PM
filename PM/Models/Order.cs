@@ -26,5 +26,6 @@ namespace PM.Models
         public string IdentityNumber { get; set; }
         public string ShippingPhone { get; set; }
         public string ShippingEmail { get; set; }
+        public int? ContactId { get; set; }
     }
 }

@@ -17,4 +17,20 @@ namespace PM.Models
         public Products Product { get; set; }
         public ProductImport Import { get; set; }
     }
+
+    [Serializable]
+    public class CoreBrain
+    {
+        public long ProductId { get; set; }
+        public int Quantity { get; set; }
+    }
+
+    [Serializable]
+    public class ProductCart
+    {
+        public Products Product { get; set; }
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+    }
+
 }
