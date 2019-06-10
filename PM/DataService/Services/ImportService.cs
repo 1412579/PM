@@ -74,6 +74,15 @@ namespace DataService.Services
             }
         }
 
+        public int GetInStock(int id)
+        {
+            var stock = 0;
+            var lstImport = GetAllByProductId(id);
+            if (lstImport != null && lstImport.Any())
+                stock = lstImport.Sum(x => x.Quantity.Value);
+            return stock;
+        }
+
         public List<ProductImport> Search(string keyWord)
         {
             throw new NotImplementedException();

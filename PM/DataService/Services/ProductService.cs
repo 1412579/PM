@@ -15,6 +15,8 @@ namespace DataService.Services
         private readonly IRepository<Products> _productRepository;
         private readonly IRepository<Contacts> _contactRepository;
         private readonly ICategoryService _categoryService;
+        private readonly IImportService _importService;
+
         private readonly IUnitService _unitService;
 
 
@@ -22,13 +24,14 @@ namespace DataService.Services
         /// Hàm khởi tạo
         /// </summary>
         /// <param name="unitOfWork"></param>
-        public ProductService(IUnitOfWork unitOfWork, ICategoryService categoryService, IUnitService unitService)
+        public ProductService(IUnitOfWork unitOfWork, ICategoryService categoryService, IUnitService unitService, IImportService importService)
         {
             _unitOfWork = unitOfWork;
             _productRepository = _unitOfWork.Repository<Products>();
             _contactRepository = _unitOfWork.Repository<Contacts>();
             _unitService = unitService;
             _categoryService = categoryService;
+            _importService = importService;
         }
 
         public bool Create(Products model)
@@ -107,6 +110,7 @@ namespace DataService.Services
                     model.Product = item;
                     model.Category = cates.FirstOrDefault(x => x.CategoryId == item.CategoryId) ?? null;
                     model.Unit = units.FirstOrDefault(x => x.UnitId == item.UnitId) ?? null;
+                    model.InStock = _importService.GetInStock((int)item.ProductId);
                     rsl.Add(model);
                 }
             }
@@ -121,6 +125,7 @@ namespace DataService.Services
                 model.Product = products;
                 model.Category = _categoryService.Get(products.CategoryId.Value);
                 model.Unit = _unitService.Get(products.UnitId.Value);
+                model.InStock = _importService.GetInStock(id);
                 return model;
             }
             return null;

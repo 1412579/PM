@@ -31,7 +31,17 @@
 @section js{
     <script>
         var IsLoading = false;
+        var ProductId = $('#ProductId');
+        var ProductCode = $('#ProductCode');
+        var ProductName = $('#ProductName');
+        var ProductPrice = $('#ProductPrice');
+        var ProductCate = $('#ProductCate');
+        var ProductUnit = $('#ProductUnit');
+        var ProductStock = $('#ProductStock');
+        var ProductSell = $('#ProductSell');
+        var Total = $('#Total');
         $(document).ready(function () {
+            emptyProductField();
             $('#phoneSearch').keyup(function () {
                 var phone = $(this).val();
                 if (phone.length == 10)
@@ -41,10 +51,11 @@
             });
             $('#SearchProduct').keydown(function () {
                 var keyword = $(this).val();
-                if (keyword.length >= 3)
                     searchProduct(keyword);
             });
-            
+            $('#ProductSell').change(function () {
+                Total.text(ToCurrency(ProductPrice.data('price') * ProductSell.val()));
+            });
         });
         function searchCustomer(phone) {
             if (IsLoading)
@@ -98,12 +109,12 @@
                         $.each(res, function (index,item) {
                             stringRsl += "<li data-pro='" + JSON.stringify(item) +"' onclick=chooseProduct(this); >" + item.Product.ProductId + " - " + item.Product.ProductCode  +" - " + item.Product.ProductName + "</li>";
                         });
-                        stringRsl += stringRsl;
-                        stringRsl += stringRsl;
-                        stringRsl += stringRsl;
-                        stringRsl += stringRsl;
-                        stringRsl += stringRsl;
-                        stringRsl += stringRsl;
+                        //stringRsl += stringRsl;
+                        //stringRsl += stringRsl;
+                        //stringRsl += stringRsl;
+                        //stringRsl += stringRsl;
+                        //stringRsl += stringRsl;
+                        //stringRsl += stringRsl;
                         ProductResult.html(stringRsl);
                     }
                     else {
@@ -120,8 +131,33 @@
         }
 
         function chooseProduct(ele) {
-            debugger;
             var data = $(ele).data('pro');
+            var ProductResult = $('#ProductResult');
+            ProductId.val(data.Product.ProductId);
+            ProductCode.val(data.Product.ProductCode);
+            ProductName.val(data.Product.ProductName);
+            ProductCate.val(data.Category.CategoryName);
+            ProductUnit.val(data.Unit.UnitName);
+            ProductPrice.val(ToCurrency(data.Product.Price));
+            ProductPrice.data('price', data.Product.Price);
+            ProductStock.val(data.InStock);
+            ProductSell.val(1);
+            Total.text(ToCurrency(data.Product.Price));
+            ProductResult.hide();
+
+        }
+
+        function emptyProductField() {
+            ProductId.val('');
+            ProductCode.val('');
+            ProductName.val('');
+            ProductCate.val('');
+            ProductUnit.val('');
+            ProductStock.val(0);
+            ProductPrice.val(0);
+            ProductPrice.data('price', 0);
+            ProductSell.val(1);
+            Total.text(0);
         }
 
         function createOrder() {
@@ -375,8 +411,14 @@
                     <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
                         Số lượng tồn
                     </label>
-                    <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="col-md-4 col-sm-4 col-xs-6">
                         <input class="form-control col-md-7 col-xs-12 text-box single-line" disabled value="" id="ProductStock">
+                    </div>
+                    <label class="control-label col-md-2 col-sm-2 col-xs-12" for="last-name">
+                        Giá bán lẻ
+                    </label>
+                    <div class="col-md-4 col-sm-4 col-xs-6">
+                        <input data-price="0" class="form-control col-md-7 col-xs-12 text-box single-line" id="ProductPrice" disabled value="">
                     </div>
                 </div>
                 <div class="form-group">
@@ -384,15 +426,15 @@
                         Số lượng bán ra
                     </label>
                     <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input class="form-control col-md-7 col-xs-12 text-box single-line" value="" id="ProductSell">
+                        <input type="number" class="form-control col-md-7 col-xs-12 text-box single-line" value="" id="ProductSell">
                     </div>
                 </div>
                 <div class="form-group">
                     <h5 class="control-label col-md-2 col-sm-2 col-xs-12 text text-success" for="last-name">
-                        Tổng tiền: 
+                        Tổng tiền:
                     </h5>
                     <div class="col-md-6 col-sm-6 col-xs-12">
-                        <h3 class="col-md-7 col-xs-12 text-box single-line text text-danger">0</h3>
+                        <h3 class="col-md-7 col-xs-12 text-box single-line text text-danger" id="Total">0</h3>
                     </div>
                 </div>
             </div>

@@ -15,5 +15,7 @@ namespace DataService.Interfaces
 
         bool Create(ProductImport model);
         bool Update(ProductImport model);
+        int GetInStock(int id);
+
     }
 }

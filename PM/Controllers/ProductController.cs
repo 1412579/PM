@@ -218,7 +218,11 @@ namespace PM.Controllers
         public IActionResult SearchProduct(string keyword)
         {
             if (string.IsNullOrEmpty(keyword))
-                return null;
+                return Json(new
+                {
+                    Status = -1,
+                    Data = "",
+                });
             var model = _productService.SearchProduct(keyword);
             if (model != null && model.Any())
                 return Json(new

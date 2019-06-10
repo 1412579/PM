@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Resize function without multiple trigger
  * 
  * Usage:
@@ -208,3 +208,6 @@ if (typeof NProgress != 'undefined') {
 	});	
 	
 
+function ToCurrency(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '₫';
+}

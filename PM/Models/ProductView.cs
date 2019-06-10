@@ -9,6 +9,7 @@ namespace PM.Models
         public Products Product { get; set; }
         public ProductCategory Category{ get; set; }
         public ProductUnit Unit { get; set; }
+        public int InStock { get; set; }
     }
 
     [Serializable]
