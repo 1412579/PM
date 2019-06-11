@@ -32,6 +32,15 @@ namespace PM.Models
         public Products Product { get; set; }
         public int Quantity { get; set; }
         public decimal Price { get; set; }
+        public decimal Total { get; set; }
+    }
+
+    [Serializable]
+    public class SalesOrder
+    {
+        public List<ProductCart> Products { get; set; }
+     
+        public decimal Total { get; set; }
     }
 
 }

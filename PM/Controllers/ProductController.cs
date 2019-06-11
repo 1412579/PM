@@ -20,6 +20,7 @@ namespace PM.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IUnitService _unitService;
         private readonly IImportService _importService;
+        private string CartCookie = "huymatlonCB";
         //private readonly IHttpContextAccessor _httpContextAccessor;
         //private ISession _session => _httpContextAccessor.HttpContext.Session;
         /// <summary>
@@ -194,7 +195,8 @@ namespace PM.Controllers
 
         public IActionResult Order()
         {
-            return View();
+            var so = BuildSO();
+            return View(so);
         }
 
         [HttpPost]
@@ -212,6 +214,13 @@ namespace PM.Controllers
                 Status = -1,
                 Data = "",
             });
+        }
+
+        [HttpPost]
+        public IActionResult GetProducts()
+        {
+            var so = BuildSO();
+            return PartialView(so);
         }
 
         [HttpPost]
@@ -269,6 +278,70 @@ namespace PM.Controllers
             });
         }
 
+        [HttpPost]
+        public IActionResult AddToCart(int productId,int quantity)
+        {
+            var lstCartNow = GetCoreBrain();
+            if (lstCartNow == null)
+                lstCartNow = new List<ProductCart>();
+            var pro = _productService.Get(productId);
+            if(pro == null)
+                return Json(new
+                {
+                    Status = -1,
+                    Data = "Sản phẩm không còn tồn tại!",
+                });
+            if(lstCartNow.Any( x=> x.Product.ProductId == productId))
+            {
+                var item = lstCartNow.FirstOrDefault(x => x.Product.ProductId == productId);
+                item.Quantity += quantity;
+                item.Total = item.Quantity * item.Price;
+            }
+            else
+            {
+                lstCartNow.Add(new ProductCart()
+                {
+                    Product = pro,
+                    Quantity = quantity,
+                    Price = pro.Price.Value
+                });
+            }
+            
+            if(lstCartNow != null && lstCartNow.Any())
+            {
+                SaveCoreBrain(lstCartNow);
+                return Json(new
+                {
+                    Status = 1,
+                    Data = "Đã thêm sản phẩm thành công",
+                });
+            }
+            return Json(new
+            {
+                Status = -1,
+                Data = "",
+            });
+        }
+
+        [HttpPost]
+        public IActionResult DeleteCB(int productId)
+        {
+            var lstCartNow = GetCoreBrain();
+            if(lstCartNow == null)
+                return Json(new
+                {
+                    Status = -1,
+                    Data = "Giỏ hàng sản phẩm không tồn tại",
+                });
+            lstCartNow = lstCartNow.Where(x => x.Product.ProductId != productId).ToList();
+            SaveCoreBrain(lstCartNow);
+            return Json(new
+            {
+                Status = 1,
+                Data = "",
+            });
+        }
+
         private void WriteCookie(string name, string value, int days = 10)
         {
             Response.Cookies.Append(name, value, new Microsoft.AspNetCore.Http.CookieOptions()
@@ -290,9 +363,21 @@ namespace PM.Controllers
             return Request.Cookies[name];
         }
 
+        private SalesOrder BuildSO()
+        {
+            var so = new SalesOrder();
+            var cbProducts = GetCoreBrain();
+            if (cbProducts != null && cbProducts.Any())
+            {
+                so.Products = cbProducts;
+                so.Total = cbProducts.Sum(x => x.Total);
+            }
+            return so;
+        }
+
         private List<ProductCart> GetCoreBrain()
         {
-            var jsonCart = ReadCookie("PMCB");
+            var jsonCart = ReadCookie(CartCookie);
             if(!string.IsNullOrEmpty(jsonCart))
             {
                 var lstPro = JsonConvert.DeserializeObject<List<CoreBrain>>(jsonCart);
@@ -308,6 +393,7 @@ namespace PM.Controllers
                             p.Product = model;
                             p.Quantity = item.Quantity;
                             p.Price = model.Price.Value;
+                            p.Total = model.Price.Value * item.Quantity;
                             listCarts.Add(p);
                         }
 
@@ -317,6 +403,20 @@ namespace PM.Controllers
                 return null;
             }
             return null;
+        }
+
+        private List<CoreBrain> ProductCart2CB(List<ProductCart> Products)
+        {
+            if(Products != null && Products.Any())
+            {
+                return Products.Select(x => new CoreBrain() { ProductId = x.Product.ProductId, Quantity = x.Quantity }).ToList();
+            }
+            return null;
+        }
+
+        private void SaveCoreBrain(List<ProductCart> Products)
+        {
+            WriteCookie(CartCookie, JsonConvert.SerializeObject(ProductCart2CB(Products)));
         }
 
     }
