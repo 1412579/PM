@@ -16,7 +16,8 @@ using DataModel.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Mvc.Authorization;
-
+using Microsoft.EntityFrameworkCore;
+using PM.Models;
 namespace PM
 {
     public class Startup
@@ -27,11 +28,6 @@ namespace PM
         }
 
         public IConfiguration Configuration { get; }
-
-        public class DatabaseOptions
-        {
-            public string ConnectionString { get; set; }
-        }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -52,9 +48,11 @@ namespace PM
 
             services.AddMvc(options => options.Filters.Add(new AuthorizeFilter())).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-            services.Configure<DatabaseOptions>(Configuration.GetSection("Data:PMDB"));
+            Setting.ConnectionString = Configuration.GetConnectionString("PMDB");
 
-            ////authen
+        //    services.AddDbContext<PMContext>(options =>
+        //options.UseSqlServer(Configuration.GetConnectionString("PMDB")));
+        ////authen
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;

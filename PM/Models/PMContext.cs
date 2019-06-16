@@ -15,6 +15,7 @@ namespace PM.Models
         {
         }
 
+
         public virtual DbSet<BlackList> BlackList { get; set; }
         public virtual DbSet<Cart> Cart { get; set; }
         public virtual DbSet<CartItem> CartItem { get; set; }
@@ -71,7 +72,7 @@ namespace PM.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=TL\\SQLEXPRESS;Database=PM;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer(Setting.ConnectionString);
             }
         }
 

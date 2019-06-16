@@ -43,4 +43,9 @@ namespace PM.Models
         public decimal Total { get; set; }
     }
 
+    public static class Setting
+    {
+        public static string ConnectionString { get; set; }
+    }
+
 }
