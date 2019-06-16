@@ -12,6 +12,7 @@ namespace DataService.Services
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private IRepository<Users> _accountService;
         //ILogger logger = LogManager.GetCurrentClassLogger();
         /// <summary>
         /// Hàm khởi tạo
@@ -22,6 +23,7 @@ namespace DataService.Services
         {
             //_promotionRepository = unitOfWork.Repository<Promotion>();
             _unitOfWork = unitOfWork;
+            _accountService = _unitOfWork.Repository<Users>();
         }
 
         /// <summary>
@@ -32,11 +34,10 @@ namespace DataService.Services
         /// <returns></returns>
         public Users Login(string username, string password)
         {
-            IRepository<Users> repository = _unitOfWork.Repository<Users>();
             Users result;
             try
             {
-                result = repository.Get(a => a.UserName == username && a.Password == PM.lib.CrytoHelper.GetMD5Hash(password));
+                result = _accountService.Get(a => a.UserName == username && a.Password == PM.lib.CrytoHelper.GetMD5Hash(password));
             }
             catch (Exception ex)
             {
@@ -49,5 +50,38 @@ namespace DataService.Services
         {
             throw new NotImplementedException();
         }
+
+        public bool Update(Users user)
+        {
+            try
+            {
+                user.Password = PM.lib.CrytoHelper.GetMD5Hash(user.Password);
+                _accountService.Update(user);
+                _unitOfWork.SaveChange();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+
+        public bool Create(Users model)
+        {
+            try
+            {
+                model.Password = PM.lib.CrytoHelper.GetMD5Hash(model.Password);
+                model.FullName = model.UserName;
+                _accountService.Add(model);
+                _unitOfWork.SaveChange();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+        }
+
     }
 }

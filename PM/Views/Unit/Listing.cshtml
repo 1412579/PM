@@ -49,7 +49,7 @@
                                         <tr>
                                             <td>@item.UnitId</td>
                                             <td>@item.UnitName</td>
-                                            <td><a asp-controller="Unit" asp-action="AddEdit" asp-route-modelId="@item.UnitId" class="btn btn-primary">Sửa</a> <a asp-controller="Unit" asp-action="Delete" asp-route-modelId="@item.UnitId" class="btn btn-danger">Xoá</a></td>
+                                            <td><a asp-controller="Unit" asp-action="AddEdit" asp-route-modelId="@item.UnitId" class="btn btn-primary">Sửa</a> <a onclick="return Confirm();" asp-controller="Unit" asp-action="Delete" asp-route-modelId="@item.UnitId" class="btn btn-danger">Xoá</a></td>
                                         </tr>
                                     }
                                 }

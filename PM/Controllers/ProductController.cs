@@ -43,7 +43,10 @@ namespace PM.Controllers
             {
                 model = _productService.Get(modelId);
                 if (model != null)
+                {
                     ViewBag.ListImport = _importService.GetAllByProductId(modelId);
+                    ViewBag.NoStock = _productService.NoStock(modelId);
+                }
             }
 
             var ListCate = new List<SelectListItem>();
@@ -199,6 +202,37 @@ namespace PM.Controllers
             return View(so);
         }
 
+        public IActionResult OrderInfo(int modelId)
+        {
+            if (modelId <= 0)
+                return RedirectToAction("ListOrder");
+            var so = BuildSOFromDB(modelId);
+            if (so.Products == null || so.Products.Count == 0)
+                return RedirectToAction("ListOrder");
+            return View(so);
+        }
+
+        public IActionResult UpdateOrder(int modelId)
+        {
+            var model = new Order();
+            if (modelId > 0)
+            {
+                model = _productService.GetOrder(modelId);
+                if (model != null)
+                {
+                    model.Deleted = true;
+                    _productService.Update(model);
+                }
+            }
+            return RedirectToAction("ListOrder");
+        }
+
+        public IActionResult ListOrder()
+        {
+            var model = _productService.GetAllOrder();
+            return View(model);
+        }
+
         [HttpPost]
         public IActionResult SearchCustomer(string phone)
         {
@@ -251,15 +285,42 @@ namespace PM.Controllers
         [HttpPost]
         public IActionResult CreateOrder(int CustomerId, string CustomerPhone, string CustomerName, string CustomerAddress, string CustomerNote)
         {
+            var so = BuildSO();
+            if (so.Products == null || so.Products.Count == 0)
+            {
+                return Json(new
+                {
+                    Status = -1,
+                    Data = "Không có thông tin sản phẩm, vui lòng thêm vào.",
+                });
+            }
+            else if(so.Products.Any(x => x.Quantity > x.Product.InStock))
+            {
+                return Json(new
+                {
+                    Status = -1,
+                    Data = "Giỏ hàng có chứa sản phẩm không còn đủ hàng để xuất, vui lòng kiểm tra lại.",
+                });
+            }
+
             bool IsSavedCustomer = false;
+            var Contact = new Contacts();
             if(CustomerId == 0)
             {
-                var newContact = new Contacts();
-                newContact.FullName = CustomerName;
-                newContact.Contents = CustomerNote;
-                newContact.Address = CustomerAddress;
-                newContact.Phone = CustomerPhone;
-                IsSavedCustomer = _productService.Create(newContact);
+                Contact.FullName = CustomerName;
+                Contact.Contents = CustomerNote;
+                Contact.Address = CustomerAddress;
+                Contact.Phone = CustomerPhone;
+                IsSavedCustomer = _productService.Create(Contact);
+            }
+            else
+            {
+                Contact = _productService.GetContactsByPhone(CustomerPhone);
+                Contact.FullName = CustomerName;
+                Contact.Contents = CustomerNote;
+                Contact.Address = CustomerAddress;
+                Contact.Phone = CustomerPhone;
+                IsSavedCustomer = _productService.Update(Contact);
             }
 
             if (!IsSavedCustomer)
@@ -271,10 +332,24 @@ namespace PM.Controllers
                 });
             }
 
+            so.Contact = Contact;
+
+            var msgReturn = SaveCart(so);
+            if (!string.IsNullOrEmpty(msgReturn))
+            {
+                return Json(new
+                {
+                    Status = -1,
+                    Data = msgReturn,
+                });
+            }
+
+            ClearCoreBrain();
+
             return Json(new
             {
-                Status = -1,
-                Data = "",
+                Status = 1,
+                Data = "Đã tạo đơn xuất hàng thành công.",
             });
         }
 
@@ -284,16 +359,16 @@ namespace PM.Controllers
             var lstCartNow = GetCoreBrain();
             if (lstCartNow == null)
                 lstCartNow = new List<ProductCart>();
-            var pro = _productService.Get(productId);
+            var pro = _productService.GetFullProductById(productId);
             if(pro == null)
                 return Json(new
                 {
                     Status = -1,
                     Data = "Sản phẩm không còn tồn tại!",
                 });
-            if(lstCartNow.Any( x=> x.Product.ProductId == productId))
+            if(lstCartNow.Any( x=> x.Product.Product.ProductId == productId))
             {
-                var item = lstCartNow.FirstOrDefault(x => x.Product.ProductId == productId);
+                var item = lstCartNow.FirstOrDefault(x => x.Product.Product.ProductId == productId);
                 item.Quantity += quantity;
                 item.Total = item.Quantity * item.Price;
             }
@@ -303,7 +378,7 @@ namespace PM.Controllers
                 {
                     Product = pro,
                     Quantity = quantity,
-                    Price = pro.Price.Value
+                    Price = pro.Product.Price.Value
                 });
             }
             
@@ -333,7 +408,7 @@ namespace PM.Controllers
                     Status = -1,
                     Data = "Giỏ hàng sản phẩm không tồn tại",
                 });
-            lstCartNow = lstCartNow.Where(x => x.Product.ProductId != productId).ToList();
+            lstCartNow = lstCartNow.Where(x => x.Product.Product.ProductId != productId).ToList();
             SaveCoreBrain(lstCartNow);
             return Json(new
             {
@@ -375,6 +450,40 @@ namespace PM.Controllers
             return so;
         }
 
+        private SalesOrder BuildSOFromDB(int OrderId)
+        {
+            var so = new SalesOrder();
+            var model = new Order();
+            if (OrderId > 0)
+            {
+                model = _productService.GetOrder(OrderId);
+                if (model != null)
+                {
+                    var orderItems = _productService.GetAllOrderItems(model.Id);
+                    if(orderItems != null && orderItems.Any())
+                    {
+                        so.Products = new List<ProductCart>();
+                        so.Contact = _productService.GetContactsByPhone(model.ShippingPhone);
+                        foreach (var item in orderItems)
+                        {
+                            var oitem = _productService.GetFullProductById(item.ProductId.Value);
+                            if (oitem != null)
+                            {
+                                var p = new ProductCart();
+                                p.Product = oitem;
+                                p.Quantity = item.Quantity.Value;
+                                p.Price = item.Price.Value;
+                                p.Total = item.Price.Value * item.Quantity.Value;
+                                so.Products.Add(p);
+                            }
+                        }
+                        so.Total = so.Products.Sum(x => x.Total);
+                    }
+                }
+            }
+            return so;
+        }
+
         private List<ProductCart> GetCoreBrain()
         {
             var jsonCart = ReadCookie(CartCookie);
@@ -386,14 +495,14 @@ namespace PM.Controllers
                     var listCarts = new List<ProductCart>();
                     foreach(var item in lstPro)
                     {
-                        var model = _productService.Get(item.ProductId);
+                        var model = _productService.GetFullProductById((int)item.ProductId);
                         if(model != null)
                         {
                             var p = new ProductCart();
                             p.Product = model;
                             p.Quantity = item.Quantity;
-                            p.Price = model.Price.Value;
-                            p.Total = model.Price.Value * item.Quantity;
+                            p.Price = model.Product.Price.Value;
+                            p.Total = model.Product.Price.Value * item.Quantity;
                             listCarts.Add(p);
                         }
 
@@ -409,7 +518,7 @@ namespace PM.Controllers
         {
             if(Products != null && Products.Any())
             {
-                return Products.Select(x => new CoreBrain() { ProductId = x.Product.ProductId, Quantity = x.Quantity }).ToList();
+                return Products.Select(x => new CoreBrain() { ProductId = x.Product.Product.ProductId, Quantity = x.Quantity }).ToList();
             }
             return null;
         }
@@ -417,6 +526,46 @@ namespace PM.Controllers
         private void SaveCoreBrain(List<ProductCart> Products)
         {
             WriteCookie(CartCookie, JsonConvert.SerializeObject(ProductCart2CB(Products)));
+        }
+
+
+        private void ClearCoreBrain()
+        {
+            WriteCookie(CartCookie, "");
+        }
+
+        private string SaveCart(SalesOrder so)
+        {
+            var Order = new Order();
+            Order.BillingAddress = so.Contact.Address;
+            Order.Note = so.Contact.Contents;
+            Order.OrderStatusId = 0;
+            Order.PaymentStatusId = 0;
+            Order.OrderTotal = so.Total;
+            Order.ShippingName = so.Contact.FullName;
+            Order.ShippingPhone = so.Contact.Phone;
+            Order.ContactId = Convert.ToInt32(so.Contact.Id);
+            var IsSavedOrder = _productService.Create(Order);
+            if (!IsSavedOrder)
+            {
+                return "Không thể lưu thông tin Đơn xuất, vui lòng thử lại sau.";
+            }
+
+            foreach(var item in so.Products)
+            {
+                var orderItem = new OrderItem();
+                orderItem.OrderId = Order.Id;
+                orderItem.ProductId = Convert.ToInt32(item.Product.Product.ProductId);
+                orderItem.Quantity = item.Quantity;
+                orderItem.Price = item.Product.Product.Price;
+                if (!_productService.Create(orderItem))
+                {
+                    Order.Deleted = true;
+                    _productService.Update(Order);
+                    return "Không thể lưu thông tin sản phẩm Đơn xuất, vui lòng thử lại sau.";
+                }
+            }
+            return "";
         }
 
     }

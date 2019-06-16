@@ -1,12 +1,13 @@
 ﻿@using PM.Models
 @using PM.lib
 @model SalesOrder
-<table id="listing" class="table table-striped table-bordered bulk_action">
+<table id="listing" class="table table-striped table-bordered bulk_action table-responsive">
     <thead>
         <tr>
             <th>ID</th>
             <th>Mã sản phẩm</th>
             <th>Tên Sản phẩm</th>
+            <th>Tồn kho</th>
             <th>Số lượng</th>
             <th>Giá xuất</th>
             <th>Tổng tiền xuất</th>
@@ -19,14 +20,15 @@
         {
             foreach (var item in Model.Products)
             {
-                <tr>
-                    <td>@item.Product.ProductId</td>
-                    <td>@item.Product.ProductCode</td>
-                    <td>@item.Product.ProductName</td>
+                <tr @(item.Product.InStock < item.Quantity ? "class=nostock" : "")>
+                    <td>@item.Product.Product.ProductId</td>
+                    <td>@item.Product.Product.ProductCode</td>
+                    <td>@item.Product.Product.ProductName</td>
+                    <th>@item.Product.InStock</th>
                     <th>@item.Quantity</th>
                     <td>@item.Price.ToCurrency()</td>
                     <td>@item.Total.ToCurrency()</td>
-                    <td><a href="javascript:" onclick="DeleteCB(@item.Product.ProductId)" class="btn btn-danger btn-xs">Xoá</a></td>
+                    <td><a href="javascript:" onclick="DeleteCB(@item.Product.Product.ProductId)" class="btn btn-danger btn-xs">Xoá</a></td>
                 </tr>
             }
         }

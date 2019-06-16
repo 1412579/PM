@@ -62,7 +62,7 @@
                                             <td>@pro.SalePrice.ToCurrency()</td>
                                             <td>@(item.Unit != null ? item.Unit.UnitName : "Chưa chọn đơn vị")</td>
                                             <td>@(item.Category != null ? item.Category.CategoryName : "Chưa chọn ngành hàng")</td>
-                                            <td><a asp-controller="Product" asp-action="AddEdit" asp-route-modelId="@pro.ProductId" class="btn btn-primary">Thông tin</a> <a asp-controller="Product" asp-action="Delete" asp-route-modelId="@pro.ProductId" class="btn btn-danger">Xoá</a></td>
+                                            <td><a asp-controller="Product" asp-action="AddEdit" asp-route-modelId="@pro.ProductId" class="btn btn-primary">Thông tin</a> <a onclick="return Confirm();" asp-controller="Product" asp-action="Delete" asp-route-modelId="@pro.ProductId" class="btn btn-danger">Xoá</a></td>
                                         </tr>
                                     }
                                 }

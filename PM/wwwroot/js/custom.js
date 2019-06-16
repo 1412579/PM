@@ -211,3 +211,15 @@ if (typeof NProgress != 'undefined') {
 function ToCurrency(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '₫';
 }
+
+
+function Confirm(msg) {
+    if (typeof msg === "undefined")
+        msg = "Bạn có chắc muốn xoá?";
+    var x = confirm(msg);
+    if (x) {
+        return true;
+    } else {
+        return false;
+    }
+}

@@ -9,5 +9,7 @@ namespace DataService.Interfaces
     public interface IAccountService
     {
         Users Login(string username,string password);
+        bool Update(Users user);
+        bool Create(Users model);
     }
 }

@@ -19,7 +19,16 @@ namespace DataService.Interfaces
         List<ProductView> SearchProduct(string keyword);
 
         Contacts GetContactsByPhone(string phone);
-        bool Create(Contacts product);
+        bool Create(Contacts model);
+        bool Update(Contacts model);
+        bool Create(Order model);
+        bool Create(OrderItem model);
+        bool Update(Order model);
+        Order GetOrder(int idp);
+
+        List<Order> GetAllOrder(int page = -1, int size = -1);
+        List<OrderItem> GetAllOrderItems(int orderId);
+        int NoStock(int productId);
 
     }
 }

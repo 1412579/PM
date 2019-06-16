@@ -55,6 +55,63 @@ namespace PM.Controllers
             return View(model);
         }
 
+        public IActionResult ChangePass()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult ChangePass(string username, string oldpass, string newpass)
+        {
+            var User = IsAuthenticated(username, oldpass);
+            if (User != null)
+            {
+                User.Password = newpass;
+                var IsSaved = _accountService.Update(User);
+                if(IsSaved)
+                    return Json(new
+                    {
+                        Status = 1,
+                        Data = "Đã cập nhật mật khẩu thành công!",
+                    });
+                else
+                    return Json(new
+                    {
+                        Status = -1,
+                        Data = "Đã xảy ra lỗi khi đổi mật khẩu!",
+                    });
+            }
+            return Json(new
+            {
+                Status = -1,
+                Data = "Mật khẩu cũ không chính xác!",
+            });
+        }
+
+        public IActionResult AddAccount()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult AddAccount(string username, string pass)
+        {
+            var IsSaved = _accountService.Create(new Users { UserName = username,Password = pass });
+            if (IsSaved)
+                return Json(new
+                {
+                    Status = 1,
+                    Data = "Đã tạo tài khoản thành công!",
+                });
+         
+            return Json(new
+            {
+                Status = -1,
+                Data = "Đã xảy ra lỗi, vui lòng thử lại sau!",
+            });
+        }
+
+
         public async Task<IActionResult> Logout(string requestPath)
         {
             await HttpContext.SignOutAsync(
