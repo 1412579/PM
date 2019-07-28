@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 namespace PM.Controllers
 {
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class ProductController : Controller
     {
         private readonly IProductService _productService;
@@ -119,12 +119,12 @@ namespace PM.Controllers
             var model = _productService.BuildProductsListing();
             return View(model);
         }
-        public IActionResult Delete(int Id)
+        public IActionResult Delete(int modelId)
         {
             var model = new Products();
-            if (Id > 0)
+            if (modelId > 0)
             {
-                model = _productService.Get(Id);
+                model = _productService.Get(modelId);
                 if (model != null)
                 {
                     model.IsDelete = true;

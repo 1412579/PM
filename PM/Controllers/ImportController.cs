@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PM.Controllers
 {
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class ImportController : Controller
     {
         private readonly IProductService _productService;

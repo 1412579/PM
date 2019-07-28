@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using DataModel.Interfaces;
 using DataService.Interfaces;
 using PM.Models;
-
+using NLog;
 namespace DataService.Services
 {
     public class AccountService : IAccountService
     {
         private readonly IUnitOfWork _unitOfWork;
         private IRepository<Users> _accountService;
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         //ILogger logger = LogManager.GetCurrentClassLogger();
         /// <summary>
         /// Hàm khởi tạo
@@ -41,6 +42,7 @@ namespace DataService.Services
             }
             catch (Exception ex)
             {
+                Logger.Error(ex, "Login");
                 result = null;
             }
             return result;

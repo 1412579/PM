@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using PM.Models;
 namespace PM.Controllers
 {
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class UnitController : Controller
     {
         private readonly IUnitService _unitService;
@@ -81,12 +81,12 @@ namespace PM.Controllers
         {
             return View(_unitService.GetAll());
         }
-        public IActionResult Delete(int Id)
+        public IActionResult Delete(int modelId)
         {
             var model = new ProductUnit();
-            if (Id > 0)
+            if (modelId > 0)
             {
-                model = _unitService.Get(Id);
+                model = _unitService.Get(modelId);
                 if(model != null)
                 {
                     model.IsDelete = true;

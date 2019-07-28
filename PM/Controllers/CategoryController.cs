@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using PM.Models;
 namespace PM.Controllers
 {
-    [AllowAnonymous]
+    //[AllowAnonymous]
     public class CategoryController : Controller
     {
         private readonly ICategoryService _categoryService;
@@ -81,12 +81,12 @@ namespace PM.Controllers
         {
             return View(_categoryService.GetAll());
         }
-        public IActionResult Delete(int cateId)
+        public IActionResult Delete(int modelId)
         {
             var model = new ProductCategory();
-            if (cateId > 0)
+            if (modelId > 0)
             {
-                model = _categoryService.Get(cateId);
+                model = _categoryService.Get(modelId);
                 if(model != null)
                 {
                     model.IsDelete = true;
